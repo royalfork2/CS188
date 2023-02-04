@@ -50,7 +50,10 @@ def sentence1() -> Expr:
     (not A) or (not B) or C
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    A = Expr('A')
+    B = Expr('B')
+    C = Expr('C')
+    return conjoin([(A | B), (~A % (~B | C)), disjoin([~A, ~B, C])])
     "*** END YOUR CODE HERE ***"
 
 
@@ -63,7 +66,11 @@ def sentence2() -> Expr:
     (not D) implies C
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    A = Expr('A')
+    B = Expr('B')
+    C = Expr('C')
+    D = Expr('D')
+    return conjoin([C % (B | D), A >> ((~B) & (~D)), (~(B & (~C)) >> A), ~D >> C])
     "*** END YOUR CODE HERE ***"
 
 
@@ -80,7 +87,11 @@ def sentence3() -> Expr:
     Pacman is born at time 0.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    PacmanAlive_0 = PropSymbolExpr('PacmanAlive_0')
+    PacmanAlive_1 = PropSymbolExpr('PacmanAlive_1')
+    PacmanBorn_0 = PropSymbolExpr('PacmanBorn_0')
+    PacmanKilled_0 = PropSymbolExpr('PacmanKilled_0')
+    return conjoin([(PacmanAlive_1 % ((PacmanAlive_0 & ~PacmanKilled_0) | (~PacmanAlive_0 & PacmanBorn_0))), ~(PacmanAlive_0 & PacmanBorn_0), PacmanBorn_0])
     "*** END YOUR CODE HERE ***"
 
 def findModel(sentence: Expr) -> Dict[Expr, bool]:
