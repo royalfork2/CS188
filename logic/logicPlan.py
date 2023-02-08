@@ -218,7 +218,7 @@ def pacmanSuccessorAxiomSingle(x: int, y: int, time: int, walls_grid: List[List[
         return None
     
     "*** BEGIN YOUR CODE HERE ***"
-    return conjoin([~PropSymbolExpr(pacman_str, x, y, time=last) , ~PropSymbolExpr(wall_str, x, y), disjoin(possible_causes)])
+    return PropSymbolExpr(pacman_str, x, y, time=now) % disjoin(possible_causes)
     "*** END YOUR CODE HERE ***"
 
 
@@ -291,27 +291,20 @@ def pacphysicsAxioms(t: int, all_coords: List[Tuple], non_outer_wall_coords: Lis
     "*** BEGIN YOUR CODE HERE ***"
     # If a wall is at (x, y), then Pacman is not at (x, y)
     for x, y in all_coords:
-        if walls_grid[x][y] == 1:
-            pacphysics_sentences.append(~PropSymbolExpr(pacman_str, x, y, time=t))
+        pacphysics_sentences.append(PropSymbolExpr(wall_str, x, y) >> ~PropSymbolExpr(pacman_str, x, y, time=t))
     
     # Pacman is at exactly one of the squares at timestep t
-    possible_locations_list = []
-    for x, y in all_coords:
-        if walls_grid[x][y] != 1:
-            possible_locations_list.append(PropSymbolExpr(pacman_str, x, y, time=t))
-    pacphysics_sentences.append(exactlyOne(possible_locations_list))
+    pacphysics_sentences.append(exactlyOne([PropSymbolExpr(pacman_str, x, y, time=t) for x, y in non_outer_wall_coords]))
 
     # Pacman takes exactly one action at timestep t
-    possible_actions_list = []
-    for direction in DIRECTIONS:
-        possible_actions_list.append(PropSymbolExpr(direction, time=t))
-    pacphysics_sentences.append(exactlyOne(possible_actions_list))
+    pacphysics_sentences.append(exactlyOne([PropSymbolExpr(direction, time=t) for direction in DIRECTIONS]))
 
     # Results of calling sensorModel(...), unless None.
     if (sensorModel != None):
         pacphysics_sentences.append(sensorModel(t, non_outer_wall_coords))
 
-    if (successorAxioms != None):
+    # Results of calling successorAxioms(...)
+    if (successorAxioms != None and t != 0):
         pacphysics_sentences.append(successorAxioms(t, walls_grid, non_outer_wall_coords))
     "*** END YOUR CODE HERE ***"
 
