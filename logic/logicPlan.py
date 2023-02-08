@@ -303,7 +303,7 @@ def pacphysicsAxioms(t: int, all_coords: List[Tuple], non_outer_wall_coords: Lis
     if (sensorModel != None):
         pacphysics_sentences.append(sensorModel(t, non_outer_wall_coords))
 
-    # Results of calling successorAxioms(...)
+    # Results of calling successorAxioms(...), unless None.
     if (successorAxioms != None and t != 0):
         pacphysics_sentences.append(successorAxioms(t, walls_grid, non_outer_wall_coords))
     "*** END YOUR CODE HERE ***"
