@@ -168,8 +168,12 @@ def atMostOne(literals: List[Expr]) -> Expr:
     itertools.combinations may be useful here.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    combinations = itertools.combinations(literals, 2)
-    return conjoin(combinations)
+    # lit = {A: True, B: False, C: False}
+    # atMostOne(lit) == True
+    # ["AB": True & "AC": True & "BC": True]
+    # DeMorgan's Law ~(A & B) == ~A | ~B  <-- use this for cnf
+    combinations = list(itertools.combinations(literals, 2))
+    return conjoin([(disjoin(~A, ~B)) for A, B in combinations])
     "*** END YOUR CODE HERE ***"
 
 
@@ -180,7 +184,7 @@ def exactlyOne(literals: List[Expr]) -> Expr:
     the expressions in the list is true.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return conjoin(atLeastOne(literals), atMostOne(literals))
     "*** END YOUR CODE HERE ***"
 
 #______________________________________________________________________________
