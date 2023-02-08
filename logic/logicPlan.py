@@ -171,6 +171,7 @@ def atMostOne(literals: List[Expr]) -> Expr:
     # lit = {A: True, B: False, C: False}
     # atMostOne(lit) == True
     # ["AB": True & "AC": True & "BC": True]
+    # For every pair, either A or B has to be False
     # DeMorgan's Law ~(A & B) == ~A | ~B  <-- use this for cnf
     combinations = list(itertools.combinations(literals, 2))
     return conjoin([(disjoin(~A, ~B)) for A, B in combinations])
