@@ -504,10 +504,8 @@ def localization(problem, agent) -> Generator:
         for x, y in non_outer_wall_coords:
             if entails((conjoin(KB) & PropSymbolExpr(agent.actions[t-1], time=t) & percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
                 KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                print('here')
             if entails((conjoin(KB) & PropSymbolExpr(agent.actions[t-1], time=t) & percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
                 KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-                print('here2')
             else:
                 possible_locations.append((x,y))
         
