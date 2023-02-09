@@ -495,7 +495,7 @@ def localization(problem, agent) -> Generator:
     for t in range(agent.num_timesteps):
         # Add pacphysics, action, and percept information to KB.
         KB.append(pacphysicsAxioms(t, all_coords, non_outer_wall_coords, walls_grid, sensorAxioms, allLegalSuccessorAxioms))
-        KB.append(PropSymbolExpr(agent.actions[t], time=t))
+        # KB.append(PropSymbolExpr(agent.actions[t], time=t))
         percept_rules = fourBitPerceptRules(t, agent.getPercepts())
         KB.append(percept_rules)
         
@@ -504,9 +504,11 @@ def localization(problem, agent) -> Generator:
         for x, y in non_outer_wall_coords:
             if entails((conjoin(KB) & PropSymbolExpr(agent.actions[t-1], time=t) & percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
                 KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
+                print('here')
             if entails((conjoin(KB) & PropSymbolExpr(agent.actions[t-1], time=t) & percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
                 KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-            if entails(conjoin(KB), PropSymbolExpr(pacman_str, x, y, time=t)):
+                print('here2')
+            else:
                 possible_locations.append((x,y))
         
         # Call agent.moveToNextState(action_t) on the current agent action at timestep t
