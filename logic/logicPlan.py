@@ -548,9 +548,43 @@ def mapping(problem, agent) -> Generator:
     KB.append(conjoin(outer_wall_sent))
 
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Get initial location (pac_x_0, pac_y_0) of Pacman, and add this to KB. Also add whether there is a wall at that location.
+    KB.append(PropSymbolExpr(pacman_str, pac_x_0, pac_y_0, time=0))
+    if ((pac_x_0, pac_y_0) in problem.walls):
+        KB.append(PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
+    else:
+        KB.append(~PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
 
     for t in range(agent.num_timesteps):
+        # Add pacphysics, action, and percept information to KB.
+        KB.append(pacphysicsAxioms(t, all_coords, non_outer_wall_coords, problem.walls, sensorAxioms, allLegalSuccessorAxioms))
+        KB.append(PropSymbolExpr(agent.actions[t], time=t))
+        percept_rules = fourBitPerceptRules(t, agent.getPercepts())
+        KB.append(percept_rules)
+
+        # Find provable wall locations with updated KB.
+        for x, y in non_outer_wall_coords:
+            if t != 0:
+                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), PropSymbolExpr(wall_str, x, y)):
+                    KB.append(PropSymbolExpr(wall_str, x, y))
+                    known_map[x][y] = 1
+                elif entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
+                    KB.append(~PropSymbolExpr(wall_str, x, y))
+                    known_map[x][y] = 0
+                else:
+                    known_map[x][y] = -1
+            else:
+                if entails(conjoin(conjoin(KB), percept_rules), PropSymbolExpr(wall_str, x, y)):
+                    KB.append(PropSymbolExpr(wall_str, x, y))
+                    known_map[x][y] = 1
+                elif entails(conjoin(conjoin(KB), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
+                    KB.append(~PropSymbolExpr(wall_str, x, y))
+                    known_map[x][y] = 0
+                else:
+                    known_map[x][y] = -1
+
+        # Call agent.moveToNextState(action_t) on the current agent action at timestep t
+        agent.moveToNextState(agent.actions[t])
         "*** END YOUR CODE HERE ***"
         yield known_map
 
