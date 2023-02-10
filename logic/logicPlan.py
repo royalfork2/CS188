@@ -612,16 +612,12 @@ def slam(problem, agent) -> Generator:
     "*** BEGIN YOUR CODE HERE ***"
     # Get initial location (pac_x_0, pac_y_0) of Pacman, and add this to KB. Also add whether there is a wall at that location.
     KB.append(PropSymbolExpr(pacman_str, pac_x_0, pac_y_0, time=0))
-    if ((pac_x_0, pac_y_0) in problem.walls):
-        KB.append(PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
-        known_map[pac_x_0][pac_y_0] = 1
-    else:
-        known_map[pac_x_0][pac_y_0] = 0
-        KB.append(~PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
+    KB.append(~PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
+    known_map[pac_x_0][pac_y_0] = 0
 
     for t in range(agent.num_timesteps):
         # Add pacphysics, action, and percept information to KB.
-        KB.append(pacphysicsAxioms(t, all_coords, non_outer_wall_coords, problem.walls, SLAMSensorAxioms, SLAMSuccessorAxioms))
+        KB.append(pacphysicsAxioms(t, all_coords, non_outer_wall_coords, known_map, SLAMSensorAxioms, SLAMSuccessorAxioms))
         KB.append(PropSymbolExpr(agent.actions[t], time=t))
         percept_rules = numAdjWallsPerceptRules(t, agent.getPercepts())
         KB.append(percept_rules)
@@ -647,22 +643,24 @@ def slam(problem, agent) -> Generator:
         possible_locations = []
         for x, y in non_outer_wall_coords:
             if t != 0:
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
+                if entails(conjoin(conjoin(KB)), PropSymbolExpr(pacman_str, x, y, time=t)):
                     KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
+                if entails(conjoin(conjoin(KB)), ~PropSymbolExpr(pacman_str, x, y, time=t)):
                     KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
                 else:
                     possible_locations.append((x,y))
             else:
-                if entails(conjoin(conjoin(KB), percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
+                if entails(conjoin(conjoin(KB)), PropSymbolExpr(pacman_str, x, y, time=t)):
                     KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB), percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
+                if entails(conjoin(conjoin(KB)), ~PropSymbolExpr(pacman_str, x, y, time=t)):
                     KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
                 else:
                     possible_locations.append((x,y))
-
+        
         # Call agent.moveToNextState(action_t) on the current agent action at timestep t
         agent.moveToNextState(agent.actions[t])
+        print(known_map)
+        print(possible_locations)
         "*** END YOUR CODE HERE ***"
         yield (known_map, possible_locations)
 
