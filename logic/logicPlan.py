@@ -502,20 +502,12 @@ def localization(problem, agent) -> Generator:
         # Find possible pacman locations with updated KB.
         possible_locations = []
         for x, y in non_outer_wall_coords:
-            if t != 0:
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-                else:
-                    possible_locations.append((x,y))
+            if entails(conjoin(KB), PropSymbolExpr(pacman_str, x, y, time=t)):
+                KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
+            if entails(conjoin(KB), ~PropSymbolExpr(pacman_str, x, y, time=t)):
+                KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
             else:
-                if entails(conjoin(conjoin(KB), percept_rules), PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB), percept_rules), ~PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-                else:
-                    possible_locations.append((x,y))
+                possible_locations.append((x,y))
         
         # Call agent.moveToNextState(action_t) on the current agent action at timestep t
         agent.moveToNextState(agent.actions[t])
@@ -564,20 +556,12 @@ def mapping(problem, agent) -> Generator:
 
         # Find provable wall locations with updated KB.
         for x, y in non_outer_wall_coords:
-            if t != 0:
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), PropSymbolExpr(wall_str, x, y)):
-                    KB.append(PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 1
-                elif entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
-                    KB.append(~PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 0
-            else:
-                if entails(conjoin(conjoin(KB), percept_rules), PropSymbolExpr(wall_str, x, y)):
-                    KB.append(PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 1
-                elif entails(conjoin(conjoin(KB), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
-                    KB.append(~PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 0
+            if entails(conjoin(KB), PropSymbolExpr(wall_str, x, y)):
+                KB.append(PropSymbolExpr(wall_str, x, y))
+                known_map[x][y] = 1
+            elif entails(conjoin(KB), ~PropSymbolExpr(wall_str, x, y)):
+                KB.append(~PropSymbolExpr(wall_str, x, y))
+                known_map[x][y] = 0
 
         # Call agent.moveToNextState(action_t) on the current agent action at timestep t
         agent.moveToNextState(agent.actions[t])
@@ -624,43 +608,25 @@ def slam(problem, agent) -> Generator:
         
         # Find provable wall locations with updated KB.
         for x, y in non_outer_wall_coords:
-            if t != 0:
-                if entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), PropSymbolExpr(wall_str, x, y)):
-                    KB.append(PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 1
-                elif entails(conjoin(conjoin(KB), PropSymbolExpr(agent.actions[t-1], time=t-1), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
-                    KB.append(~PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 0
-            else:
-                if entails(conjoin(conjoin(KB), percept_rules), PropSymbolExpr(wall_str, x, y)):
-                    KB.append(PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 1
-                elif entails(conjoin(conjoin(KB), percept_rules), ~PropSymbolExpr(wall_str, x, y)):
-                    KB.append(~PropSymbolExpr(wall_str, x, y))
-                    known_map[x][y] = 0
+            if entails(conjoin(KB), PropSymbolExpr(wall_str, x, y)):
+                KB.append(PropSymbolExpr(wall_str, x, y))
+                known_map[x][y] = 1
+            elif entails(conjoin(KB), ~PropSymbolExpr(wall_str, x, y)):
+                KB.append(~PropSymbolExpr(wall_str, x, y))
+                known_map[x][y] = 0
 
         # Find possible pacman locations with updated KB.
         possible_locations = []
         for x, y in non_outer_wall_coords:
-            if t != 0:
-                if entails(conjoin(conjoin(KB)), PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB)), ~PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-                else:
-                    possible_locations.append((x,y))
+            if entails(conjoin(KB), PropSymbolExpr(pacman_str, x, y, time=t)):
+                KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
+            if entails(conjoin(KB), ~PropSymbolExpr(pacman_str, x, y, time=t)):
+                KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
             else:
-                if entails(conjoin(conjoin(KB)), PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(PropSymbolExpr(pacman_str, x, y, time=t))
-                if entails(conjoin(conjoin(KB)), ~PropSymbolExpr(pacman_str, x, y, time=t)):
-                    KB.append(~PropSymbolExpr(pacman_str, x, y, time=t))
-                else:
-                    possible_locations.append((x,y))
+                possible_locations.append((x,y))
         
         # Call agent.moveToNextState(action_t) on the current agent action at timestep t
         agent.moveToNextState(agent.actions[t])
-        print(known_map)
-        print(possible_locations)
         "*** END YOUR CODE HERE ***"
         yield (known_map, possible_locations)
 
