@@ -155,7 +155,45 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        move = self.maxHelper(gameState, self.depth)
+        return move[1]
+
+    def maxHelper(self, gameState: GameState, depth: int):
+        if (depth == 0):
+            return (self.evaluationFunction(gameState), 'Stop')
+        if (gameState.isWin() or gameState.isLose()):
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        v = float('-inf')
+        bestAction = ''
+        move = (v, bestAction)
+        for action in gameState.getLegalActions(0):
+            successor = self.minHelper(gameState.generateSuccessor(0, action), depth, 1)
+            if (successor[0] > move[0]):
+                move = (successor[0], action)
+        return move
+    
+    def minHelper(self, gameState: GameState, depth: int, agent: int):
+        if (gameState.isWin() or gameState.isLose()):
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        v = float('inf')
+        bestAction = ''
+        move = (v, bestAction)
+        if (agent == gameState.getNumAgents() - 1 and depth != 0):
+            for action in gameState.getLegalActions(agent):     
+                successor = self.maxHelper(gameState.generateSuccessor(agent, action), depth - 1)
+                if (successor[0] < move[0]):
+                    move = (successor[0], action)
+        if (agent == gameState.getNumAgents() - 1 and depth == 0):
+            for action in gameState.getLegalActions(agent):     
+                return (self.evaluationFunction(gameState.generateSuccessor(agent, action)), 'Stop')
+        if (agent != gameState.getNumAgents() - 1):
+            for action in gameState.getLegalActions(agent):
+                successor = self.minHelper(gameState.generateSuccessor(agent, action), depth, agent + 1)
+                if (successor[0] < move[0]):
+                    move = (successor[0], action)
+        return move
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
