@@ -314,7 +314,11 @@ def betterEvaluationFunction(currentGameState: GameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: <We chose the closest food, the closest pellet, the number of remaining food, and the number of remaining pellets
+                    as our features to include in our function. We weighted the score of remaining food to minimum manhattan distance as 
+                    5:1. We made them negative because we want to incentivize the ghost approaching food and grabbing more food/pellets.
+                    We found that including ghosts made pacman too scared to approach some areas of the map, so we removed that entirely.
+                    Finally, we had a "do not lose" and "do win" feature that made sure Pacman didn't lose.>
     """
     "*** YOUR CODE HERE ***"
     score = 0
