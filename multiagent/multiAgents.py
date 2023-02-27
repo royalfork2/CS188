@@ -323,25 +323,21 @@ def betterEvaluationFunction(currentGameState: GameState):
     pellets = currentGameState.getCapsules()
 
 
-    closestFoodWeight = -10
+    closestFoodWeight = -1
     closestFood = 0
     if (len(food.asList()) != 0):
         closestFood = min([manhattanDistance(pos, foodPos) for foodPos in food.asList()])
 
-    numFoodWeight = -11
+    numFoodWeight = -5
     numFoodScore = currentGameState.getNumFood()
 
-    closestPelletWeight = -12
+    closestPelletWeight = -1
     closestPellet = 0
     if (len(pellets) != 0):
         closestPellet = min([manhattanDistance(pos, pelletPos) for pelletPos in pellets])
 
-    closestGhostWeight = 0
-    closestGhost = min([manhattanDistance(pos, ghostPos) for ghostPos in currentGameState.getGhostPositions()])
-
-    ghostScared = 0
-    if (currentGameState.getGhostState(1).scaredTimer > 0):
-        ghostScared = 1000
+    numPelletWeight = -5
+    numPellets = len(pellets)
 
     doNotLoseScore = 0
     if (currentGameState.isLose()):
@@ -351,8 +347,7 @@ def betterEvaluationFunction(currentGameState: GameState):
     if (currentGameState.isWin()):
         doNotLoseScore = 100000
 
-
-    score = currentGameState.getScore() + closestFoodWeight * closestFood + numFoodWeight * numFoodScore + closestPelletWeight * closestPellet + closestGhostWeight * closestGhost + ghostScared + doNotLoseScore + doWinScore
+    score = currentGameState.getScore() + closestFoodWeight * closestFood + numFoodWeight * numFoodScore + closestPelletWeight * closestPellet + numPelletWeight * numPellets + doNotLoseScore + doWinScore
     return score
 
 # Abbreviation
