@@ -102,7 +102,29 @@ def joinFactors(factors: List[Factor]):
 
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    unconditioned = set()
+    conditioned = set()
+    domainDict = dict
+    for factor in factors:
+        for var in factor.conditionedVariables():
+            conditioned.add(var)
+        for var in factor.unconditionedVariables():
+            unconditioned.add(var)
+        domainDict = factor.variableDomainsDict()
+
+    for var in unconditioned:
+        if var in conditioned:
+            conditioned.remove(var)
+    
+    joinFactor = Factor(unconditioned, conditioned, domainDict)
+
+    for assignment in joinFactor.getAllPossibleAssignmentDicts():
+        product = 1
+        for factor in factors:
+            product = product * factor.getProbability(assignment)
+        joinFactor.setProbability(assignment, product)
+    
+    return joinFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
@@ -153,7 +175,22 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        unconditioned = factor.unconditionedVariables();
+        unconditioned.remove(eliminationVariable);
+        conditioned = factor.conditionedVariables();
+        domainDict = factor.variableDomainsDict();
+
+        newFactor = Factor(unconditioned, conditioned, domainDict)
+
+        for assignment in newFactor.getAllPossibleAssignmentDicts():
+            sum = 0
+            for var in factor.variableDomainsDict()[eliminationVariable]:
+                assignment[eliminationVariable] = var
+                sum = sum + factor.getProbability(assignment)
+            newFactor.setProbability(assignment, sum)
+
+        return newFactor 
+        
         "*** END YOUR CODE HERE ***"
 
     return eliminate
