@@ -357,9 +357,10 @@ class DiscreteDistribution(dict):
         {}
         """
         "*** YOUR CODE HERE ***"
+        total = float(self.total())
         if (self.total() != 0):
             for i in self.keys():
-                self[i] = self[i]/float(self.total())
+                self[i] = self[i]/total
         else: 
             return 
         "*** END YOUR CODE HERE ***"
@@ -468,8 +469,13 @@ class InferenceModule:
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
         """
         "*** YOUR CODE HERE ***"
+        if (ghostPosition == jailPosition and noisyDistance == None): 
+            return 1
+        if (ghostPosition == jailPosition and noisyDistance != None):
+            return 0
+        if (ghostPosition != jailPosition and noisyDistance == None):
+            return 0
         trueDistance = manhattanDistance(pacmanPosition, ghostPosition)
-        print(trueDistance)
         return busters.getObservationProbability(noisyDistance, trueDistance)
         "*** END YOUR CODE HERE ***"
 
@@ -583,7 +589,9 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        pacmanPosition = gameState.getPacmanPosition()
+        for position in self.allPositions:
+            self.beliefs[position] *= self.getObservationProb(observation, pacmanPosition, position, self.getJailPosition())
         "*** END YOUR CODE HERE ***"
         self.beliefs.normalize()
     
