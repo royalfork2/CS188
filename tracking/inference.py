@@ -590,8 +590,9 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         pacmanPosition = gameState.getPacmanPosition()
-        for position in self.allPositions:
-            self.beliefs[position] *= self.getObservationProb(observation, pacmanPosition, position, self.getJailPosition())
+        jailPosition = self.getJailPosition()
+        for ghostPosition in self.allPositions:
+            self.beliefs[ghostPosition] *= self.getObservationProb(observation, pacmanPosition, ghostPosition, jailPosition)
         "*** END YOUR CODE HERE ***"
         self.beliefs.normalize()
     
