@@ -166,9 +166,4 @@ class GreedyBustersAgent(BustersAgent):
                 minDistance = nextDistance
                 bestAction = action
         return bestAction
-
-
-
-        
-        successorPosition = Actions.getSuccessor(position, action)
         "*** END YOUR CODE HERE ***"
