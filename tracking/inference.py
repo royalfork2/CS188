@@ -647,7 +647,9 @@ class ParticleFilter(InferenceModule):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        for i in range(self.numParticles):
+            pos = self.legalPositions[i % len(self.legalPositions)]  # use mod to wrap around overflow
+            self.particles.append(pos)
         "*** END YOUR CODE HERE ***"
 
     def getBeliefDistribution(self):
@@ -659,7 +661,11 @@ class ParticleFilter(InferenceModule):
         This function should return a normalized distribution.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        beliefDistribution = DiscreteDistribution()
+        for particle in self.particles:
+            beliefDistribution[particle] += 1
+        beliefDistribution.normalize()
+        return beliefDistribution
         "*** END YOUR CODE HERE ***"
     
     ########### ########### ###########
@@ -679,7 +685,20 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        pacmanPosition = gameState.getPacmanPosition()
+        jailPosition = self.getJailPosition()
+        beliefDistribution = DiscreteDistribution()
+        for particle in self.particles:
+            beliefDistribution[particle] += self.getObservationProb(observation, pacmanPosition, particle, jailPosition)
+        beliefDistribution.normalize()
+
+        if beliefDistribution.total() == 0:
+            self.initializeUniformly(gameState)
+            beliefDistribution = self.getBeliefDistribution()
+        
+        self.particles = []
+        for _ in range(self.numParticles):
+            self.particles.append(beliefDistribution.sample())
         "*** END YOUR CODE HERE ***"
     
     ########### ########### ###########
@@ -692,5 +711,15 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        beliefDistribution = self.getBeliefDistribution()
+        updatedBeliefs = DiscreteDistribution()
+        for p in self.allPositions:
+            newPosDist = self.getPositionDistribution(gameState, p)
+            for newPosition in newPosDist:
+                updatedBeliefs[newPosition] += newPosDist[newPosition] * beliefDistribution[p]
+        updatedBeliefs.normalize()
+
+        self.particles = []
+        for _ in range(self.numParticles):
+            self.particles.append(updatedBeliefs.sample())
         "*** END YOUR CODE HERE ***"
