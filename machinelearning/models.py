@@ -46,7 +46,16 @@ class PerceptronModel(object):
         Train the perceptron until convergence.
         """
         "*** YOUR CODE HERE ***"
-        x, y = dataset.iterate_once(2)
+        check = True
+        while check:
+            for x, y in dataset.iterate_once(1):
+                if self.get_prediction(x) != nn.as_scalar(y):
+                    check = False
+                    nn.Parameter.update(self.get_weights(), x, nn.as_scalar(y))
+            if check:
+                break
+            check = True
+            
         
             
 
@@ -59,6 +68,7 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self
 
     def run(self, x):
         """
@@ -70,6 +80,7 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        
 
     def get_loss(self, x, y):
         """
