@@ -132,6 +132,12 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.lr = .5
+        self.w1 = nn.Parameter(784, 200)
+        self.b1 = nn.Parameter(1, 200)
+        self.w2 = nn.Parameter(200, 10)
+        self.b2 = nn.Parameter(1, 10)
+        self.params = [self.w1, self.b1, self.w2, self.b2]
 
     def run(self, x):
         """
@@ -148,6 +154,7 @@ class DigitClassificationModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        return nn.AddBias(nn.Linear(nn.ReLU(nn.AddBias(nn.Linear(x, self.w1), self.b1)), self.w2), self.b2)
 
     def get_loss(self, x, y):
         """
@@ -163,12 +170,22 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SoftmaxLoss(self.run(x), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        batch_size = 100
+        loss = float('inf')
+        while loss >= 0.015:
+            for x, y in dataset.iterate_once(batch_size):
+                loss = self.get_loss(x, y)
+                gradients = nn.gradients(loss, self.params)
+                loss = nn.as_scalar(loss)
+                for i in range(len(self.params)):
+                    self.params[i].update(gradients[i], -self.lr)
 
 class LanguageIDModel(object):
     """
@@ -188,6 +205,7 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        
 
     def run(self, xs):
         """
@@ -236,8 +254,18 @@ class LanguageIDModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        batch_size = 100
+        loss = float('inf')
+        while loss >= 0.015:
+            for x, y in dataset.iterate_once(batch_size):
+                loss = self.get_loss(x, y)
+                gradients = nn.gradients(loss, self.params)
+                loss = nn.as_scalar(loss)
+                for i in range(len(self.params)):
+                    self.params[i].update(gradients[i], -self.lr)
